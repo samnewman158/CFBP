@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>College Football Mascot Quiz</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f0f9ff;
+      text-align: center;
+      padding: 40px;
+    }
+
+    h1 {
+      color: #002244;
+    }
+
+    #question {
+      font-size: 24px;
+      margin: 20px 0;
+    }
+
+    .choices {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      align-items: center;
+      max-width: 400px;
+      margin: 0 auto;
+    }
+
+    .choices button {
+      padding: 12px 20px;
+      font-size: 18px;
+      border: none;
+      border-radius: 8px;
+      background-color: #fff;
+      cursor: pointer;
+      transition: background 0.2s ease;
+      width: 100%;
+      box-shadow: 2px 2px 5px rgba(0,0,0,0.1);
+    }
+
+    .choices button:hover {
+      background-color: #cce6ff;
+    }
+
+    #feedback {
+      font-size: 20px;
+      margin-top: 20px;
+    }
+
+    #score, #highscore {
+      margin-top: 20px;
+      font-size: 20px;
+    }
+  </style>
+</head>
+<ul class="navbar-nav ms-auto py-4 py-lg-0">
+    <li class="nav-item"><a class="nav-link px-lg-3 py-3 py-lg-4" href="index.html">Home</a></li>
+</ul>
+<body>
+  <h1>College Football Mascot Quiz</h1>
+  <div id="question">Loading...</div>
+  <div class="choices" id="choices"></div>
+  <div id="feedback"></div>
+  <div id="score">Score: 0</div>
+  <div id="highscore">High Score: 0</div>
+
+  <script>
+    const mascotData = [
+      { mascot: "Big Al", school: "Alabama" },
+      { mascot: "Uga", school: "Georgia" },
+      { mascot: "Brutus Buckeye", school: "Ohio State" },
+      { mascot: "Smokey", school: "Tennessee" },
+      { mascot: "Bevo", school: "Texas" },
+      { mascot: "Mike the Tiger", school: "LSU" },
+      { mascot: "Ralphie", school: "Colorado" },
+      { mascot: "The Tree", school: "Stanford" },
+      { mascot: "Puddles the Duck", school: "Oregon" },
+      { mascot: "Sebastian the Ibis", school: "Miami" },
+      { mascot: "Sparty", school: "Michigan State" },
+      { mascot: "Boomer and Sooner", school: "Oklahoma" },
+      { mascot: "Otto the Orange", school: "Syracuse" },
+      { mascot: "Reveille", school: "Texas A&M" },
+      { mascot: "Buzz", school: "Georgia Tech" },
+      { mascot: "Cosmo the Cougar", school: "BYU" },
+      { mascot: "Albert and Alberta", school: "Florida" },
+      { mascot: "Testudo", school: "Maryland" },
+      { mascot: "Pistol Pete", school: "Oklahoma State" },
+      { mascot: "Zippy", school: "Akron" },
+      { mascot: "Knightro", school: "UCF" },
+      { mascot: "Buster Bronco", school: "Boise State" },
+      { mascot: "Blue", school: "Middle Tennessee" },
+      { mascot: "Chip", school: "Colorado" },
+      { mascot: "Louie the Loper", school: "Nebraska Kearney" },
+      { mascot: "Rowdy", school: "UTSA" },
+      { mascot: "Victor E. Huskie", school: "NIU" },
+      { mascot: "The Falcon", school: "Air Force" },
+      { mascot: "Joe Bruin", school: "UCLA" },
+      { mascot: "Osceola and Renegade", school: "Florida State" },
+      { mascot: "Herbie Husker", school: "Nebraska" },
+      { mascot: "Jayhawk", school: "Kansas" },
+      { mascot: "Cy the Cardinal", school: "Iowa State" },
+      { mascot: "Goldy Gopher", school: "Minnesota" },
+      { mascot: "HokieBird", school: "Virginia Tech" },
+      { mascot: "Cam the Ram", school: "Colorado State" },
+      { mascot: "Butch T. Cougar", school: "Washington State" },
+      { mascot: "Swoop", school: "Utah" },
+      { mascot: "Rocky the Rocket", school: "Toledo" },
+      { mascot: "Freddie Falcon", school: "Bowling Green" },
+      { mascot: "Norm the Niner", school: "Charlotte" },
+      { mascot: "The Mountaineer", school: "West Virginia" },
+      { mascot: "Rameses", school: "North Carolina" },
+      { mascot: "The Blue Devil", school: "Duke" }
+    ];
+
+    let score = 0;
+    let highScore = parseInt(localStorage.getItem("mascotHighScore")) || 0;
+    document.getElementById("highscore").textContent = `High Score: ${highScore}`;
+    let correctSchool = "";
+
+    function shuffle(array) {
+      return array.sort(() => Math.random() - 0.5);
+    }
+
+    function nextQuestion() {
+      document.getElementById("feedback").textContent = "";
+
+      const choicesDiv = document.getElementById("choices");
+      choicesDiv.innerHTML = "";
+
+      const randomMascot = mascotData[Math.floor(Math.random() * mascotData.length)];
+      correctSchool = randomMascot.school;
+
+      document.getElementById("question").textContent = `Which school has the mascot "${randomMascot.mascot}"?`;
+
+      const schools = new Set([correctSchool]);
+      while (schools.size < 4) {
+        const random = mascotData[Math.floor(Math.random() * mascotData.length)].school;
+        schools.add(random);
+      }
+
+      const shuffled = shuffle(Array.from(schools));
+      shuffled.forEach(school => {
+        const btn = document.createElement("button");
+        btn.textContent = school;
+        btn.onclick = () => checkAnswer(school);
+        choicesDiv.appendChild(btn);
+      });
+    }
+
+    function checkAnswer(picked) {
+      const feedback = document.getElementById("feedback");
+      if (picked === correctSchool) {
+        score++;
+        feedback.textContent = "Correct! 🎉";
+        feedback.style.color = "green";
+        if (score > highScore) {
+          highScore = score;
+          localStorage.setItem("mascotHighScore", highScore);
+          document.getElementById("highscore").textContent = `High Score: ${highScore}`;
+        }
+      } else {
+        feedback.textContent = `Wrong! The correct answer was ${correctSchool}.`;
+        feedback.style.color = "red";
+        score = 0;
+      }
+
+      document.getElementById("score").textContent = `Score: ${score}`;
+
+      setTimeout(nextQuestion, 1500);
+    }
+
+    nextQuestion();
+  </script>
+</body>
+</html>
